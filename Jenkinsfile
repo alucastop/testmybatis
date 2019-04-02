@@ -2,13 +2,13 @@
 
 pipeline {
     agent any
-    environment {
+    /*environment {
         AUTH = credentials('mysql_collab')
         AUTH_REMOTE = credentials('778fa5df-6070-47e0-b029-a2f0bccc3daa')
-    }
+    }*/
 
     tools {
-        jdk 'jdk-8u202'
+        jdk 'jdk-8u191'
     }
 
     stages {
@@ -18,23 +18,32 @@ pipeline {
             }
         }
 
-        stage('integration tests') {
+        /*stage('integration tests') {
             steps {
                 sh 'chmod 755 ${WORKSPACE}/src/test/resources/integration/integrationTest.sh'
                 sh '${WORKSPACE}/src/test/resources/integration/integrationTest.sh'
                 sh 'newman run ${WORKSPACE}/src/test/resources/integration/appliCollab.non-regression.json'
             }
-        }
+        }*/
 
         stage('build & packaging') {
             steps {
-                sh 'mvn build-helper:parse-version versions:set -DnewVersion=\\${parsedVersion.majorVersion}.\\${parsedVersion.minorVersion}.\\${parsedVersion.nextIncrementalVersion} versions:commit verify -Pprod -DskipTests'
+                //sh 'mvn build-helper:parse-version versions:set -DnewVersion=\\${parsedVersion.majorVersion}.\\${parsedVersion.minorVersion}.\\${parsedVersion.nextIncrementalVersion} versions:commit verify -DskipTests'
+                sh "mvn clean package"
                 sh "chmod -R o+wr target"
-                archiveArtifacts artifacts: '**/target/*.war', fingerprint: true
+                //archiveArtifacts artifacts: '**/target/*.war', fingerprint: true
+            }
+        }
+        
+        stage('deployment') {
+            steps {
+                sh "cp "
+                sh "chmod -R o+wr target"
+                //archiveArtifacts artifacts: '**/target/*.war', fingerprint: true
             }
         }
 
-        stage('docker img build and publish') {
+        /*stage('docker img build and publish') {
             steps {
                 script {
                     def dockerImage
@@ -74,9 +83,9 @@ pipeline {
                     }
                 }
             }
-        }
+        }*/
         
-        stage('Git Tag Build') {
+        /*stage('Git Tag Build') {
             steps {
                 withCredentials([usernamePassword(credentialsId: '1a0b5422-c6f6-4d13-8609-20cce28c1110', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
                     script {
@@ -100,6 +109,6 @@ pipeline {
                     }
                 }
             }
-        }
+        }*/
     }
 }
