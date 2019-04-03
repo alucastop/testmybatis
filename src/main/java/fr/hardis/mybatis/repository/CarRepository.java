@@ -10,7 +10,5 @@ import java.util.List;
 
 @Repository
 public interface CarRepository extends MybatisRepository<Car, Long> {
-
-    @Query()
     List<Car> findAllByIdUser(Long idUser);
 }
