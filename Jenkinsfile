@@ -2,13 +2,13 @@
 
 pipeline {
     agent any
-    environment {
+    /*environment {
         AUTH = credentials('mysql_collab')
         AUTH_REMOTE = credentials('778fa5df-6070-47e0-b029-a2f0bccc3daa')
-    }
+    }*/
 
     tools {
-        jdk 'jdk-8u202'
+        jdk 'jdk-8u191'
     }
 
     stages {
@@ -18,23 +18,34 @@ pipeline {
             }
         }
 
-        stage('integration tests') {
+        /*stage('integration tests') {
             steps {
                 sh 'chmod 755 ${WORKSPACE}/src/test/resources/integration/integrationTest.sh'
                 sh '${WORKSPACE}/src/test/resources/integration/integrationTest.sh'
                 sh 'newman run ${WORKSPACE}/src/test/resources/integration/appliCollab.non-regression.json'
             }
-        }
+        }*/
 
         stage('build & packaging') {
             steps {
-                sh 'mvn build-helper:parse-version versions:set -DnewVersion=\\${parsedVersion.majorVersion}.\\${parsedVersion.minorVersion}.\\${parsedVersion.nextIncrementalVersion} versions:commit verify -Pprod -DskipTests'
+                //sh 'mvn build-helper:parse-version versions:set -DnewVersion=\\${parsedVersion.majorVersion}.\\${parsedVersion.minorVersion}.\\${parsedVersion.nextIncrementalVersion} versions:commit verify -DskipTests'
+                sh "mvn clean package"
                 sh "chmod -R o+wr target"
-                archiveArtifacts artifacts: '**/target/*.war', fingerprint: true
+                //archiveArtifacts artifacts: '**/target/*.war', fingerprint: true
             }
         }
+        
+        stage('Publishing') {
+           steps {
+               withCredentials([usernamePassword(credentialsId: 'b4c63131-20c8-4912-b77f-044f7be4f88a', usernameVariable: 'userName', passwordVariable: 'userPassword')]) {
+                   sh '''
+                       sh -c "sleep 1;  echo ${userPassword}"|script -qc "su -c 'rm -rf /opt/crcesu/crm/crcrsu-crm-app.jar && cp ${WORKSPACE}/target/mybatis-*.jar /opt/crcesu/crm/crcrsu-crm-app.jar' - ${userName}"
+                   '''
+               }
+           }
+       }
 
-        stage('docker img build and publish') {
+        /*stage('docker img build and publish') {
             steps {
                 script {
                     def dockerImage
@@ -74,9 +85,9 @@ pipeline {
                     }
                 }
             }
-        }
+        }*/
         
-        stage('Git Tag Build') {
+        /*stage('Git Tag Build') {
             steps {
                 withCredentials([usernamePassword(credentialsId: '1a0b5422-c6f6-4d13-8609-20cce28c1110', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
                     script {
@@ -100,6 +111,6 @@ pipeline {
                     }
                 }
             }
-        }
+        }*/
     }
 }
