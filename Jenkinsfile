@@ -39,7 +39,7 @@ pipeline {
            steps {
                withCredentials([usernamePassword(credentialsId: 'b4c63131-20c8-4912-b77f-044f7be4f88a', usernameVariable: 'userName', passwordVariable: 'userPassword')]) {
                    sh '''
-                       sh -c "sleep 1;  echo ${userPassword}"|script -qc "su -c 'rm -rf /opt/crcesu/crm/crcrsu-crm-app.jar && cp ${WORKSPACE}/target/mybatis-*.jar /opt/crcesu/crm/crcrsu-crm-app.jar' - ${userName}"
+                       sh -c "sleep 1;  echo ${userPassword}"|script -qc "su -c 'rm -rf /opt/crcesu/crm/crcesu-crm-app.jar && cp ${WORKSPACE}/target/mybatis-*.jar /opt/crcesu/crm/crcesu-crm-app.jar' - ${userName}"
                    '''
                }
            }
