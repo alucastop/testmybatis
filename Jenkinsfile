@@ -9,6 +9,7 @@ pipeline {
 
     tools {
         jdk 'jdk-8u191'
+        scannerHome 'SonarQube Scanner 2.8'
     }
 
     stages {
@@ -28,7 +29,6 @@ pipeline {
 
             steps {
                 // requires SonarQube Scanner 2.8+
-                def scannerHome = tool 'SonarQube Scanner 2.8';
                 withSonarQubeEnv('sonar_crcesu') {
                   sh "${scannerHome}/bin/sonar-scanner"
                 }
