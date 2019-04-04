@@ -30,7 +30,7 @@ pipeline {
                     sh "mvn clean package sonar:sonar
                       -Dsonar.projectKey=testmybatis \
                       -Dsonar.host.url=http://hgpvnxappdlv003/sonarqube \
-                      -Dsonar.login=81c5a9f04a943137e037b15d797ece58fb6204e5
+                      -Dsonar.login=81c5a9f04a943137e037b15d797ece58fb6204e5 \
                     "
                 }
             }
