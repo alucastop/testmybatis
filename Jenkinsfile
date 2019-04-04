@@ -9,7 +9,6 @@ pipeline {
 
     tools {
         jdk 'jdk-8u191'
-        sonar_scanner 'SonarQube-Scanner-2.8'
     }
 
     stages {
@@ -19,21 +18,31 @@ pipeline {
             }
         }
 
-        stage('build & packaging') {
+        stage('build') {
             steps {
                 sh "mvn clean package"
             }
         }
 
         stage('SonarQube analysis') {
-
             steps {
-                // requires SonarQube Scanner 2.8+
-                withSonarQubeEnv('sonar_crcesu') {
-                  sh "${sonar_scanner}/bin/sonar-scanner"
+                def scannerHome = tool 'sonarScanner';
+                withSonarQubeEnv('sonar_crcesu_server') {
+                    sh "${scannerHome}/bin/sonar-scanner"
                 }
-              }
-          }
+            }
+        }
+
+        stage("Quality Gate") {
+            steps {
+                timeout(time: 1, unit: 'HOURS') {
+                    // Parameter indicates whether to set pipeline to UNSTABLE if Quality Gate fails
+                    // true = set pipeline to UNSTABLE, false = don't
+                    // Requires SonarQube Scanner for Jenkins 2.7+
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
         
         stage('Publishing') {
            steps {
