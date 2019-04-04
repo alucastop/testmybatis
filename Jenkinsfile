@@ -18,17 +18,20 @@ pipeline {
             }
         }
 
-        stage('build') {
+/*        stage('build') {
             steps {
                 sh "mvn clean package"
             }
-        }
+        }*/
 
-        stage('SonarQube analysis') {
+        stage('build && SonarQube analysis') {
             steps {
-                def scannerHome = tool 'sonarScanner';
                 withSonarQubeEnv('sonar_crcesu_server') {
-                    sh "${scannerHome}/bin/sonar-scanner"
+                    sh "mvn clean package sonar:sonar
+                      -Dsonar.projectKey=testmybatis \
+                      -Dsonar.host.url=http://hgpvnxappdlv003/sonarqube \
+                      -Dsonar.login=81c5a9f04a943137e037b15d797ece58fb6204e5
+                    "
                 }
             }
         }
