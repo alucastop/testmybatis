@@ -2,37 +2,32 @@
 
 pipeline {
     agent any
-    /*environment {
-        AUTH = credentials('mysql_collab')
-        AUTH_REMOTE = credentials('778fa5df-6070-47e0-b029-a2f0bccc3daa')
-    }*/
+
+    environment {
+        SONAR_SCANNER_HOME = ${JENKINS_HOME}/sonar-scanner/sonar-scanner-3.3.0.1492-linux
+    }
 
     tools {
         jdk 'jdk-8u191'
     }
 
     stages {
-        stage('checkout') {
+        stage('Checkout') {
             steps {
                 checkout scm
             }
         }
 
-/*        stage('build') {
+        stage('Build') {
             steps {
                 sh "mvn clean package"
             }
-        }*/
+        }
 
-        stage('build && SonarQube analysis') {
+        stage('SonarQube analysis') {
             steps {
                 withSonarQubeEnv('sonar_crcesu_server') {
-                    sh '''
-                        mvn clean package sonar:sonar \
-                        -Dsonar.projectKey=testmybatis \
-                        -Dsonar.host.url=http://hgpvnxappdlv003/sonarqube \
-                        -Dsonar.login=81c5a9f04a943137e037b15d797ece58fb6204e5
-                    '''
+                    sh "${SONAR_SCANNER_HOME}/bin/sonar-scanner"
                 }
             }
         }
